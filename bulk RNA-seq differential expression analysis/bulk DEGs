@@ -1,0 +1,185 @@
+###step1-BRAIN_counts2Rdata 
+rm(list=ls())
+options(stringsAsFactors = F)
+library(stringr)  
+
+{
+  a1=read.table('counts/all.counts.id.txt',header = T)
+  dim(a1)
+  a1[1:4,1:4]
+  mat= a1[,7:ncol(a1)] 
+  rownames(mat)=a1$Geneid
+  mat[1:4,1:4]
+  keep_feature <- rowSums (mat > 1) > 1
+  table(keep_feature)
+  mat <- mat[keep_feature, ]
+  mat[1:4,1:4]
+  dim(mat) 
+  colnames(mat)
+  colnames(mat)=gsub('...hisat2.','',gsub('.bam','',  colnames(mat)))
+  colnames(mat)
+  ensembl_matrix=mat
+  colnames(ensembl_matrix)
+  
+  b=read.csv('SraRunTable.txt')
+  group_list=b$disease_status
+  table(group_list)
+  save(ensembl_matrix,group_list,file='ensembl_matrix.Rdata')
+}
+
+###step2-Sample data file name is 'All_results.csv' DESEQ2
+rm(list=ls())
+setwd("F:/cibersortx/rna-seq analysis/results")
+library(ggplot2)
+diff <- read.csv("F:/cibersortx/rna-seq analysis/results/Schizo_DEG_results.csv",header = T)
+
+logFC <- diff$log2FoldChange
+padj <- diff$padj
+
+data <- data.frame(logFC=logFC,padj=padj)
+data<-na.omit(data)
+data$sig[(data$padj > 0.05|(data$logFC < 0.5)&(data$logFC > -0.5))] <- "no"
+data$sig[data$padj <= 0.05 & data$logFC > 0.5] <- "up"
+data$sig[data$padj <= 0.05 & data$logFC < -0.5] <- "down"
+
+min(data$logFC)
+write.table(data,"all_sample_DEseq2_data.txt",sep = "\t",quote = F,row.names = T)
+# Choose the maximum value as the upper and lower boundary of xlim
+x_lim <- max(logFC,-logFC)
+
+library(ggplot2)
+library(RColorBrewer)
+pdf(file = "all_sample_DEseq2_volcano.pdf",width=8,height=8)
+theme_set(theme_bw())
+p <- ggplot(data,aes(logFC,-1*log10(padj),
+                     color = sig))+geom_point()+
+  xlim(-4,4) +  labs(x="log2(FoldChange)",y="-log10(FDR)")
+p <- p + scale_color_manual(values =c("#0072B5","grey","#BC3C28"))+
+  geom_hline(yintercept=-log10(0.05),linetype=4)+
+  geom_vline(xintercept=c(-0.5,0.5),linetype=4)
+p <- p +theme(panel.grid =element_blank())+
+  theme(axis.line = element_line(size=0))+ylim(0,15)
+p <- p  +guides(colour = FALSE)
+p <- p +theme(axis.text=element_text(size=20),axis.title=element_text(size=20))
+p
+dev.off()
+print(p)
+
+###Sample data file name is 'All_results.csv' edgeR
+rm(list=ls())
+setwd("F:/cibersortx/rna-seq analysis/results")
+library(ggplot2)
+diff <- read.csv("F:/cibersortx/rna-seq analysis/results/Schizo_DEG_results.csv",header = T)
+
+logFC <- diff$logFC2
+padj <- diff$FDR
+
+data <- data.frame(logFC=logFC,padj=padj)
+data<-na.omit(data)
+data$sig[(data$padj > 0.05|(data$logFC < 0.5)&(data$logFC > -0.5))] <- "no"
+data$sig[data$padj <= 0.05 & data$logFC > 0.5] <- "up"
+data$sig[data$padj <= 0.05 & data$logFC < -0.5] <- "down"
+
+min(data$logFC)
+write.table(data,"ALL_sample_edgeR_data.txt",sep = "\t",quote = F,row.names = T)
+# Choose the maximum value as the upper and lower boundary of xlim
+x_lim <- max(logFC,-logFC)
+
+library(ggplot2)
+library(RColorBrewer)
+pdf(file = "all_sample_edgeR_volcano.pdf",width=8,height=8)
+theme_set(theme_bw())
+p <- ggplot(data,aes(logFC,-1*log10(padj),
+                     color = sig))+geom_point()+
+  xlim(-4,4) +  labs(x="log2(FoldChange)",y="-log10(FDR)")
+p <- p + scale_color_manual(values =c("#0072B5","grey","#BC3C28"))+
+  geom_hline(yintercept=-log10(0.05),linetype=4)+
+  geom_vline(xintercept=c(-0.5,0.5),linetype=4)
+p <- p +theme(panel.grid =element_blank())+
+  theme(axis.line = element_line(size=0))+ylim(0,15)
+p <- p  +guides(colour = FALSE)
+p <- p +theme(axis.text=element_text(size=20),axis.title=element_text(size=20))
+p
+dev.off()
+print(p)
+
+###Sample data file name is 'All_results.csv' LIMMA
+rm(list=ls())
+setwd("F:/cibersortx/rna-seq analysis/results")
+library(ggplot2)
+diff <- read.csv("F:/cibersortx/rna-seq analysis/results/Schizo_DEG_results.csv",header = T)
+
+logFC <- diff$logFC1
+padj <- diff$P.Value
+
+data <- data.frame(logFC=logFC,padj=padj)
+data<-na.omit(data)
+data$sig[(data$padj > 0.05|(data$logFC < 0.5)&(data$logFC > -0.5))] <- "no"
+data$sig[data$padj <= 0.05 & data$logFC > 0.5] <- "up"
+data$sig[data$padj <= 0.05 & data$logFC < -0.5] <- "down"
+
+min(data$logFC)
+write.table(data,"astro_LIMMA_data.txt",sep = "\t",quote = F,row.names = T)
+# Choose the maximum value as the upper and lower boundary of xlim
+x_lim <- max(logFC,-logFC)
+
+library(ggplot2)
+library(RColorBrewer)
+pdf(file = "astro_LIMMA_volcano.pdf",width=8,height=8)
+theme_set(theme_bw())
+p <- ggplot(data,aes(logFC,-1*log10(padj),
+                     color = sig))+geom_point()+
+  xlim(-4,4) +  labs(x="log2(FoldChange)",y="-log10(FDR)")
+p <- p + scale_color_manual(values =c("#0072B5","grey","#BC3C28"))+
+  geom_hline(yintercept=-log10(0.05),linetype=4)+
+  geom_vline(xintercept=c(-0.5,0.5),linetype=4)
+p <- p +theme(panel.grid =element_blank())+
+  theme(axis.line = element_line(size=0))+ylim(0,15)
+p <- p  +guides(colour = FALSE)
+p <- p +theme(axis.text=element_text(size=20),axis.title=element_text(size=20))
+p
+dev.off()
+print(p)
+
+
+###VENN PLOT
+rm(list=ls())
+setwd("F:/cibersortx/rna-seq analysis/results")
+install.packages("VennDiagram") 
+library(VennDiagram)
+deseq2 <- read.table("F:/cibersortx/rna-seq analysis/results/all_sample_DEseq2_data.txt", header = T)
+edgeR <- read.table("F:/cibersortx/rna-seq analysis/results/all_sample_edgeR_data.txt", header = T)
+limma <- read.table("F:/cibersortx/rna-seq analysis/results/all_sample_LIMMA_data.txt", header = T)
+diff <- read.csv("F:/cibersortx/rna-seq analysis/results/Schizo_DEG_results.csv",header = T)
+
+rownames(deseq2)= diff$X
+rownames(edgeR)= diff$X
+rownames(limma)= diff$X
+
+
+deseq2= deseq2[(deseq2$sig=="up"|deseq2$sig =="down"),]
+edgeR= edgeR[(edgeR$sig=="up"|edgeR$sig =="down"),]
+limma= limma[(limma$sig=="up"|limma$sig =="down"),]
+
+A <- rownames(deseq2)
+B <- rownames(edgeR)
+C <- rownames(limma)
+D <- Reduce(intersect, list(A, B, C))
+print(D)
+write.table(D, "all_sample_intersect_gene_name.txt", sep = "\t",quote = F, row.names = T)
+
+
+venn.plot <- venn.diagram(
+  list(deseq2=A,edgeR=B,limma=C),
+  filename = "all_sample_GSE_DEGsvenn.tiff",
+  lty = 1,
+  lwd = 1,
+  col = "black", 
+  fill = c("red", "green", "blue"),
+  alpha = 0.60,
+  cat.col = "black",
+  cat.cex = 0.8,
+  cat.fontface = "bold",
+  margin = 0.07,
+  cex = 0.8
+)
