@@ -1,0 +1,30 @@
+rm(list=ls())
+setwd("F:/CIBERSORTX")
+
+data.final<-read.csv("24 gene in 8 cell types/10 BULK DEGS IN SC.txt",header=T,check.names=F,sep="\t")
+head(data.final)
+
+#logfc
+data.final$log2FC[data.final$FC< 0] = log2(abs(data.final$FC[data.final$FC <0])) 
+data.final$log2FC[data.final$FC> 0] = log2(data.final$FC[data.final$FC> 0])
+data.final[is.na(data.final)] <- 0
+
+data.final$GENE <- factor(data.final$GENE,levels = unique(data.final$GENE))
+
+data.final$CELL_TYPE <- factor(data.final$CELL_TYPE, levels=unique(data.final$CELL_TYPE))
+ 
+library(ggplot2)
+P <- ggplot(data.final,aes(x=CELL_TYPE,y=GENE))+
+  geom_point(aes(size=`log2FC`,
+                 color=`change`))+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        axis.text.x=element_text(angle=90,hjust = 1,vjust=0.5))+
+  scale_color_manual(values=c("blue","grey","red"))+
+  labs(x=NULL,y=NULL)+
+  scale_size(range = c(1,10))+
+  scale_x_discrete(limits=c("Oligodendrocyte","IT","SST","PVALB","L4_IT"), expand = c(1.5,-1))
+  
+P
+ggsave(P,filename = "10genes.pdf",width = 10,height = 6,dpi=300)
+ggsave(P,filename = "10genes.png",width = 10,height = 6,dpi=300)
