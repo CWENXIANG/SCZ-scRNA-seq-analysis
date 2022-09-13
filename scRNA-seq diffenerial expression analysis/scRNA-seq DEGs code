@@ -1,3 +1,36 @@
+###DEGs
+rm(list = ls())  
+setwd("F:/cibersortx/new/group_false_cpm")
+options(stringsAsFactors = F)
+geps1 <- read.table("CIBERSORTx_Job16_output/CIBERSORTxGEP_Job16_GEPs_Filtered.txt", head = T, row.names = 1)
+geps2 <- read.table('CIBERSORTx_Job17_output/CIBERSORTxGEP_Job17_GEPs_Filtered.txt', head = T, row.names = 1)
+stderr1 <- read.table("CIBERSORTx_Job16_output/CIBERSORTxGEP_Job16_GEPs_StdErrs.txt", head = T, row.names = 1)
+stderr2 <- read.table("CIBERSORTx_Job17_output/CIBERSORTxGEP_Job17_GEPs_StdErrs.txt", head = T, row.names = 1)
+
+geps <- geps1
+stderr <- stderr1
+
+for (i in 1:ncol(geps1)){
+  vBetaZ <- sapply(1:nrow(geps1), function(j) (geps1[j,i]-geps2[j,i])/sqrt(stderr1[j,i]^2+stderr2[j,i]^2))
+  ZPs <- 2*pnorm(-abs(vBetaZ))
+  Zqvals <- p.adjust(ZPs, method="BH")
+  
+  geps <- data.frame(geps[1:35542,],vBetaZ)
+  stderr <- data.frame(stderr[1:35542,],Zqvals)
+}
+
+geps_final <- geps[1:35542,c(20:ncol(geps))]
+names(geps_final) <- names(geps1)
+
+stderr_final <- stderr[1:35542,c(20:ncol(stderr))]
+names(stderr_final) <- names(stderr1)
+
+
+write.csv(geps_final,"19types_geps_false_cpm.csv")
+write.csv(stderr_final,"19types_stder_false_cpm.csv")
+
+
+###Volcano plot
 rm(list = ls())
 setwd("F:/CIBERSORTX")
 BiocManager::install("tidyverse")
