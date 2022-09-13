@@ -1,0 +1,36 @@
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+setwd("C:/Users/dell/Desktop")
+
+KEGG_dataset <- read.table(file ="C:/Users/dell/Desktop/endo.txt",
+                           header = TRUE, sep = "\t")
+
+#PValue low to high
+KEGG_dataset <- arrange(KEGG_dataset,KEGG_dataset[,4])
+
+KEGG_dataset$Description <- factor(KEGG_dataset$Description,levels = rev(KEGG_dataset$Description))
+
+mytheme <- theme(axis.title=element_text(face="bold", size=14,colour = 'black'), #坐标轴标题
+                 axis.text=element_text(face="bold", size=14,colour = 'black'), #坐标轴标签
+                 axis.line = element_line(size=0.5, colour = 'black'), #轴线
+                 panel.background = element_rect(color='black'), #绘图区边框
+                 legend.key = element_blank() #关闭图例边框
+)
+
+p <- ggplot(KEGG_dataset,aes(x=ratio,y=Description,colour=-1*q,size=Count))+
+  geom_point()+
+  scale_size(range=c(5, 8))+
+  scale_colour_gradient(low = "blue",high = "red")+
+  theme_bw()+
+  ylab(" Pathway Terms")+
+  xlab("Gene Ratio")+
+  labs(color=expression(-log[10](qValue)))+
+  theme(legend.title=element_text(size=14), legend.text = element_text(size=14))+
+  theme(axis.title.y = element_text(margin = margin(r = 50)),axis.title.x = element_text(margin = margin(t = 20)))+
+  theme(axis.text.x = element_text(face ="bold",color="black",angle=0,vjust=1))
+plot <- p+mytheme
+plot
+
+ggsave(plot,filename = "endo.pdf",width = 10,height = 6,dpi=300)
+ggsave(plot,filename = "endo.png",width = 10,height = 6,dpi=300)
