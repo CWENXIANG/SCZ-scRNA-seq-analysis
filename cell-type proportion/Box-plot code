@@ -1,0 +1,33 @@
+###Box-plot
+rm(list=ls())
+setwd("F:/cibersortx/new/fraction/0311notdisable/19TYPES_FALSE")
+library(ggplot2)
+library(ggpubr)
+windowsFonts(Times=windowsFont("Times New Roman"))
+
+datap <- read.table("FRACTION.txt",sep = "\t",quote = "\"'",header = T)
+
+ggplot(data = datap, aes(Cell_Type, Percentage)) +
+   geom_boxplot(aes(fill = Mixture), notch = FALSE, size = 0.4) +
+   scale_fill_brewer(palette = "Set2") +
+   guides(fill=guide_legend(title="Repeat")) +
+   theme_bw() +
+   theme(legend.position="none", axis.text.x=element_text(colour="black",family="Times",size=12,angle=65, vjust=0.6), axis.text.y=element_text(family="Times",size=14,face="plain")) #设置x轴刻度标签的字体属性
+                
+p <- ggplot(data = datap, mapping = aes(x = Cell_Type, y = Percentage))
+p
+p <- p + geom_violin(aes(x = Cell_Type,y = Percentage,fill = Mixture),position = position_dodge(0.8),size = 0.4,trim = F)
+p
+p <- p + geom_jitter(aes(scat_adj+dist_cat_n,Percentage,fill=Mixture),position = position_jitter(0.1,0), shape = 21, size = 0.8)
+p
+
+### p-value wilcoxon
+compare_means(Percentage~Mixture, data=datap, group.by = "Cell_Type")
+p <-p + stat_compare_means(aes(group=Mixture), label = "p.signif")                                                                            
+
+p <- p + theme(plot.title=element_text(hjust=0.5))+ theme(legend.title = element_text(face = "bold"))
+p <- p + theme(text=element_text(family="Times", face="bold", size=12)) 
+p <- p + labs(x = "n = 186 : 138") 
+p
+
+
