@@ -1,1 +1,72 @@
+###csv_to_txt
+import pandas as pd
+
+data = pd.read_csv('F:/cibersortx/SCZ_cibersortx/new/bulk_case+control_final.csv', encoding='utf-8')
+with open('F:/cibersortx/SCZ_cibersortx/new/txt version/bulk_case+control_final.txt','a+', encoding='utf-8') as f:
+    for line in data.values:
+        f.write(" ".join('%s' %id for id in line)+'\n')
+
+
+###split_single_cell.py
+import openpyxl
+
+table = openpyxl.load_workbook('origin\single_cell_RNA-seq\MTG_CgG_21458_CELLS.xlsx') 
+sheet = table['Sheet1'] 
+
+table2 = openpyxl.Workbook()
+sheet1 = table2.active
+
+for row in sheet.values:
+    if row[1] == None: 
+        continue
+    elif row[1] == 'subclass_label':
+        continue
+    else:
+        a = row[1].replace("/","|")
+        print(a)
+        try: 
+            sheet1 = table2[a]
+        except KeyError:
+            sheet1 = table2.create_sheet(a)
+        finally:
+            sheet1 = table2[a]
+            sheet1.append(list(row)) 
+
+table2.save('middle\single_cell_split.xlsx') 
+
+
+###mapping_single_cell.py
+import openpyxl
+import csv
+
+table = openpyxl.load_workbook('middle\single_cell_pre500.xlsx') 
+sheet = table['Sheet'] 
+
+table2 = openpyxl.Workbook()
+sheet1 = table2.active
+out_f = open('new\single_cell.csv','w+', newline="")
+writer = csv.writer(out_f)
+header_list = ['sample_name', 'subclass_label', 'region_label']
+
+with open("origin\single_cell_RNA-seq\SINGLE_CELL_RNA-seq_MULTIPLE_matrix .csv") as f: 
+    line_map = f.readline()
+    for element in line_map.split(','):
+        header_list.append(element)
+    writer.writerow(header_list)
+    line_map = f.readline()
+    while line_map:
+        sample_name = line_map.split(',')[0]
+        for row in sheet.values:
+            if(sample_name == row[0]):
+                print(sample_name)
+                new_list = list(row)
+                for element in line_map.split(','):
+                    new_list.append(element)
+                #print(len(new_list))
+                writer.writerow(new_list)
+        
+        line_map = f.readline()
+
+out_f.close()
+
 
