@@ -1,0 +1,95 @@
+rm(list = ls())
+setwd("F:/CIBERSORTX")
+
+df <- read.csv("pvalb2_logfc1.6_neuron degs.txt",header = T,sep = "\t")
+head(df)
+
+N1 <- df[df$cluster == "1",]
+N2 <- df[df$cluster == "2",]
+N3 <- df[df$cluster == "3",]
+N4 <- df[df$cluster == "4",]
+N5 <- df[df$cluster == "5",]
+N6 <- df[df$cluster == "6",]
+N7 <- df[df$cluster == "7",]
+N8 <- df[df$cluster == "8",]
+N9 <- df[df$cluster == "9",]
+N10 <- df[df$cluster == "10",]
+N11 <- df[df$cluster == "11",]
+
+
+jaccard <- function(a, b) {
+  intersection = length(intersect(a, b))
+  union = length(a) + length(b) - intersection
+  return (intersection/union)
+}
+
+N1_2 <- jaccard(N1$geneID,N2$geneID)
+N1_3 <- jaccard(N1$geneID,N3$geneID)
+N1_4 <- jaccard(N1$geneID,N4$geneID)
+N1_5 <- jaccard(N1$geneID,N5$geneID)
+N1_6 <- jaccard(N1$geneID,N6$geneID)
+N1_7 <- jaccard(N1$geneID,N7$geneID)
+N1_8 <- jaccard(N1$geneID,N8$geneID)
+N1_9 <- jaccard(N1$geneID,N9$geneID)
+N1_10 <- jaccard(N1$geneID,N10$geneID)
+N1_11 <- jaccard(N1$geneID,N11$geneID)
+
+
+
+N2_3 <- jaccard(N2$geneID,N3$geneID)
+N2_4 <- jaccard(N2$geeID,N4$geneID)
+N2_5 <- jaccard(N2$geneID,N5$geneID)
+N2_6 <- jaccard(N2$geneID,N6$geneID)
+N2_7 <- jaccard(N2$geneID,N7$geneID)
+N2_8 <- jaccard(N2$geneID,N8$geneID)
+N2_9 <- jaccard(N2$geneID,N9$geneID)
+N2_10 <- jaccard(N2$geneID,N10$geneID)
+N2_11 <- jaccard(N2$geneID,N11$geneID)
+
+N3_4 <- jaccard(N3$geeID,N4$geneID)
+N3_5 <- jaccard(N3$geneID,N5$geneID)
+N3_6 <- jaccard(N3$geneID,N6$geneID)
+N3_7 <- jaccard(N3$geneID,N7$geneID)
+N3_8 <- jaccard(N3$geneID,N8$geneID)
+N3_9 <- jaccard(N3$geneID,N9$geneID)
+N3_10 <- jaccard(N3$geneID,N10$geneID)
+N3_11 <- jaccard(N3$geneID,N11$geneID)
+
+N4_5 <- jaccard(N4$geneID,N5$geneID)
+N4_6 <- jaccard(N4$geneID,N6$geneID)
+N4_7 <- jaccard(N4$geneID,N7$geneID)
+N4_8 <- jaccard(N4$geneID,N8$geneID)
+N4_9 <- jaccard(N4$geneID,N9$geneID)
+N4_10 <- jaccard(N4$geneID,N10$geneID)
+N4_11 <- jaccard(N4$geneID,N11$geneID)
+
+N5_6 <- jaccard(N5$geneID,N6$geneID)
+N5_7 <- jaccard(N5$geneID,N7$geneID)
+N5_8 <- jaccard(N5$geneID,N8$geneID)
+N5_9 <- jaccard(N5$geneID,N9$geneID)
+N5_10 <- jaccard(N5$geneID,N10$geneID)
+N5_11 <- jaccard(N5$geneID,N11$geneID)
+
+N6_7 <- jaccard(N6$geneID,N7$geneID)
+N6_8 <- jaccard(N6$geneID,N8$geneID)
+N6_9 <- jaccard(N6$geneID,N9$geneID)
+N6_10 <- jaccard(N6$geneID,N10$geneID)
+N6_11 <- jaccard(N6$geneID,N11$geneID)
+
+N7_8 <- jaccard(N7$geneID,N8$geneID)
+N7_9 <- jaccard(N7$geneID,N9$geneID)
+N7_10 <- jaccard(N7$geneID,N10$geneID)
+N7_11 <- jaccard(N7$geneID,N11$geneID)
+
+N8_9 <- jaccard(N8$geneID,N9$geneID)
+N8_10 <- jaccard(N8$geneID,N10$geneID)
+N8_11 <- jaccard(N8$geneID,N11$geneID)
+
+N9_10 <- jaccard(N9$geneID,N10$geneID)
+N9_11 <- jaccard(N9$geneID,N11$geneID)
+
+N10_11 <- jaccard(N10$geneID,N11$geneID)
+
+intersect(N9$geneID, N10$geneID)
+
+length(Reduce(union, list(N1$geneID,N2$geneID,N3$geneID,N4$geneID,N5$geneID,N6$geneID,N7$geneID,N8$geneID,N9$geneID,N10$geneID,N11$geneID)))
