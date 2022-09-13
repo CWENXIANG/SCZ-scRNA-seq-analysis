@@ -1,0 +1,111 @@
+###bulk_delcolumn
+import pandas as pd
+import numpy as np
+import re
+import csv
+import sys
+
+
+mapdf = pd.read_csv('middle\\bulk_rename.csv') 
+mapdf = mapdf.astype(str)
+
+gene_list = []
+for element in mapdf['gencodeID']:
+    gene_list.append(element)
+
+df = pd.read_csv('origin\Bulk_RNA-seq\\brainseq_count2.csv') 
+print('load finished!')
+df = df.astype(str)
+
+for gene in df.columns.values.tolist():
+    if(gene not in gene_list):
+        print(gene)
+        df.drop([gene], axis=1, inplace=True)
+
+df = df.to_csv("middle\\bulk_genename_1.csv",index=0) 
+
+###bulk_repcolumn
+import os
+import pandas as pd
+import numpy as np
+import re
+import csv
+import sys
+
+rename_dict = {}
+
+mapdf = pd.read_csv('middle\\CWX-bulk_rename.csv') 
+mapdf = mapdf.astype(str)
+
+for i in range(0, len(mapdf['gencodeID'])):
+    rename_dict[mapdf['gencodeID'][i]] = mapdf['Symbol'][i]
+    
+print(rename_dict)
+
+df = pd.read_csv('middle\\bulk_genename_1.csv') 
+print('load finished!')
+print(df)
+df = df.astype(str)
+df.rename(columns = rename_dict, inplace=True)
+print(df)
+
+df = df.to_csv("middle\\bulk_genename_2.csv",index=0) 
+
+###mapping_bulk
+import os
+import openpyxl
+import pandas as pd
+import numpy as np
+import re
+import csv
+import sys
+
+with open('F:/cibersortx/brain scz rnaseq/brainseq_count2.csv','r') as csvfile:
+    print('load finished!')
+    reader = csv.reader(csvfile)
+    column0 = [row[0]for row in reader]
+
+print(column0)
+
+table = openpyxl.load_workbook('origin\Bulk_RNA-seq\\brain_sampledetail_DEPFC_18ys.xlsx') 
+sheet_case = table['case']
+sheet_control = table['control']
+
+out_f_case = open('new\\bulk_case.csv','w+', newline="")
+writer_case = csv.writer(out_f_case)
+out_f_control = open('new\\bulk_control.csv','w+', newline="")
+writer_control = csv.writer(out_f_control)
+header_list = ['Sample', 'Region', 'Age', 'Dx']
+
+with open("middle\\bulk_genename_2.csv") as f: 
+    
+    line_map = f.readlines()  
+    
+    for row in sheet_case.values:
+        index = 0
+        for i in range(0, len(column0)):
+            if(row[0] == column0[i]):
+                index = i
+        
+        new_list = [row[0], row[1], row[2], row[3]]
+        for element in line_map[index].split(','):
+            new_list.append(element)
+        print(new_list)
+        writer_case.writerow(new_list)
+    
+    for row in sheet_control.values:
+        index = 0
+        for i in range(0, len(column0)):
+            if(row[0] == column0[i]):
+                index = i
+
+        new_list = [row[0], row[1], row[2], row[3]]
+        for element in line_map[index].split(','):
+            new_list.append(element)
+        print(new_list)
+        writer_control.writerow(new_list)    
+
+
+out_f_case.close()   
+out_f_control.close()  
+
